@@ -1,0 +1,2 @@
+# ssg
+Boot.dev SSG
