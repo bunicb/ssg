@@ -76,6 +76,21 @@ class TestInlineMarkdown(unittest.TestCase):
             ]
         )
 
+    def test_split_delim_bold_and_italic(self):
+        old_nodes = TextNode("This is text with a **bolded phrase** and an _italic_ word", TextType.NORMAL)
+        new_nodes = split_nodes_delimiter([old_nodes], "**", TextType.BOLD)
+        new_nodes = split_nodes_delimiter(new_nodes, "_", TextType.ITALIC)
+        self.assertEqual(
+            new_nodes,
+            [
+                TextNode("This is text with a ", TextType.NORMAL),
+                TextNode("bolded phrase", TextType.BOLD),
+                TextNode(" and an ", TextType.NORMAL),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" word", TextType.NORMAL),
+            ]
+        )
+
     # test markdown extraction
     def test_extract_markdown_images(self):
         matches = extract_markdown_images(
