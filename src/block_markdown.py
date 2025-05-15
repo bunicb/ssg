@@ -20,17 +20,17 @@ def markdown_to_blocks(markdown):
         filtered_blocks.append(block)
     return filtered_blocks
 
-def block_to_block_type(blocks):
-    # blocks is a list, write an if statement if first element starts with 1-6 # characters and then a whitespace, it is a heading
-    if re.findall(r"^#{1,6} \w+", blocks[0]):
+def block_to_block_type(block):
+    lines = block.split("\n")
+    if block.startswith(("# ", "## ", "### ", "#### ", "##### ", "###### ")):
         return BlockType.HEADING
-    elif blocks[0] == "```" and blocks[-1] == "```":
+    if len(lines) > 1 and lines[0].startswith("```") and lines[-1].startswith("```"):
         return BlockType.CODE
-    elif all(block.startswith("> ") for block in blocks):
+    elif all(line.startswith("> ") for line in lines):
         return BlockType.QUOTE
-    elif all(block.startswith("- ") for block in blocks):
+    elif all(line.startswith("- ") for line in lines):
         return BlockType.UNORDERED_LIST
-    elif all(blocks[i].startswith(f"{i + 1}. ") for i in range(0, len(blocks))):
+    elif all(lines[i].startswith(f"{i + 1}. ") for i in range(0, len(lines))):
         return BlockType.ORDERED_LIST
 
     return BlockType.PARAGRAPH
