@@ -1,5 +1,6 @@
 import os
 import shutil
+from markdown_to_html import markdown_to_html_node
 
 def copy_static_files(src, dst):
     # empty the public folder if it exists
@@ -16,3 +17,25 @@ def copy_static_files(src, dst):
             shutil.copy2(src_file, dst_file)
         elif os.path.isdir(src_file):
             copy_static_files(src_file, dst_file)
+
+def extract_title(markdown):
+    lines = markdown.split("\n")
+    for line in lines:
+        if line.startswith("# "):
+            return line[2:].strip()
+    raise Exception("No title found in markdown")
+
+def generate_page(from_path, template_path, dest_path):
+    print (f"Generating page from {from_path} to {dest_path} using {template_path}")
+    with open(from_path, "r") as f:
+        markdown = f.read()
+    with open(template_path, "r") as f:
+        template = f.read()
+
+    html = markdown_to_html_node(markdown).to_html()
+    title = extract_title(markdown)
+    modified_template = template.replace("{{ Title }}", title).replace("{{ Content }}", html)
+    # Ensure the destination directory exists
+    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+    with open(dest_path, "w") as f:
+        f.write(modified_template)

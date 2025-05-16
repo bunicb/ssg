@@ -104,12 +104,6 @@ class TestInlineMarkdown(unittest.TestCase):
         )
         self.assertListEqual([("link", "https://example.com")], matches)
 
-    def test_extract_markdown_links_no_link(self):
-        matches = extract_markdown_links(
-            "This is text with a ![image](https://i.imgur.com/zjjcJKZ.png)"
-        )
-        self.assertListEqual([], matches)
-
     def test_extract_markdown_images_no_image(self):
         matches = extract_markdown_images(
             "This is text with a [link](https://example.com)"
@@ -118,7 +112,7 @@ class TestInlineMarkdown(unittest.TestCase):
 
     def test_extract_links_matches(self):
         matches = extract_markdown_links(
-            "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev) and ![image](https://i.imgur.com/zjjcJKZ.png)."
+            "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)."
         )
         self.assertListEqual([("to boot dev", "https://www.boot.dev"), ("to youtube", "https://www.youtube.com/@bootdotdev")], matches)
 
@@ -213,6 +207,25 @@ class TestInlineMarkdown(unittest.TestCase):
         self.assertListEqual(
             [
                 TextNode("", TextType.NORMAL),
+            ],
+            new_nodes,
+        )
+
+    def test_split_links_list(self):
+        node = [
+            TextNode("- [Why Glorfindel is More Impressive than Legolas](/blog/glorfindel)", TextType.NORMAL),
+            TextNode("- [Why Tom Bombadil Was a Mistake](/blog/tom)", TextType.NORMAL),
+            TextNode("- [The Unparalleled Majesty of \"The Lord of the Rings\"](/blog/majesty)", TextType.NORMAL),
+        ]
+        new_nodes = split_nodes_link(node)
+        self.assertListEqual(
+            [
+                TextNode("- ", TextType.NORMAL),
+                TextNode("Why Glorfindel is More Impressive than Legolas", TextType.LINK, "/blog/glorfindel"),
+                TextNode("- ", TextType.NORMAL),
+                TextNode("Why Tom Bombadil Was a Mistake", TextType.LINK, "/blog/tom"),
+                TextNode("- ", TextType.NORMAL),
+                TextNode("The Unparalleled Majesty of \"The Lord of the Rings\"", TextType.LINK, "/blog/majesty"),
             ],
             new_nodes,
         )

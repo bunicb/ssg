@@ -27,7 +27,7 @@ def extract_markdown_images(text):
     return re.findall(r"!\[(.*?)\]\((.*?)\)", text)
 
 def extract_markdown_links(text):
-    return re.findall(r"[^!]\[(.*?)\]\((.*?)\)", text)
+    return re.findall(r"\[(.*?)\]\((.*?)\)", text)
 
 
 def split_nodes_image(old_nodes):
@@ -50,8 +50,9 @@ def split_nodes_image(old_nodes):
                 raise ValueError("Invalid markdown syntax")
             if nodes[0] != "":
                 new_nodes.append(TextNode(nodes[0], TextType.NORMAL))
-                new_nodes.append(TextNode(alt_text, TextType.IMAGE, image_url))
-                node = nodes[1]
+            new_nodes.append(TextNode(alt_text, TextType.IMAGE, image_url))
+            node = nodes[1]
+
         if node != "":
             new_nodes.append(TextNode(node, TextType.NORMAL))
 
@@ -77,7 +78,7 @@ def split_nodes_link(old_nodes):
                 raise ValueError("Invalid markdown syntax")
             if nodes[0] != "":
                 new_nodes.append(TextNode(nodes[0], TextType.NORMAL))
-                new_nodes.append(TextNode(alt_text, TextType.LINK, link_url))
+            new_nodes.append(TextNode(alt_text, TextType.LINK, link_url))
             node = nodes[1]
         if node != "":
             new_nodes.append(TextNode(node, TextType.NORMAL))
@@ -86,10 +87,10 @@ def split_nodes_link(old_nodes):
 
 def text_to_textnodes(text):
     nodes = [TextNode(text, TextType.NORMAL)]
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_link(nodes)
     nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
     nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC)
     nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
-    nodes = split_nodes_image(nodes)
-    nodes = split_nodes_link(nodes)
 
     return nodes

@@ -30,8 +30,17 @@ def markdown_to_html_node(text):
             block = block[3:-3].lstrip()
             children.append(ParentNode("pre", text_node_to_html_node(TextNode(block, TextType.CODE))))
         elif block_type == BlockType.QUOTE:
-            block = block.replace("> ", "")
-            children.append(ParentNode("blockquote",  text_to_children(block)))
+            new_block = ""
+            for line in block.split("\n"):
+                if line.startswith(">"):
+                    # if the line is the last one, don't append a new line
+                    if line == block.split("\n")[-1]:
+                        new_block = new_block + line[1:].lstrip()
+                    else:
+                        new_block = new_block + line[1:].lstrip() + "\n"
+                else:
+                    continue
+            children.append(ParentNode("blockquote",  text_to_children(new_block)))
         elif block_type == BlockType.UNORDERED_LIST:
             children.append(ParentNode("ul", handle_list_items(block)))
         elif block_type == BlockType.ORDERED_LIST:
