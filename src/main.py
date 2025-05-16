@@ -1,10 +1,7 @@
 from textnode import TextNode
+from helpers import copy_static_files
 
 def main():
-    # Create a TextNode object
-    node1 = TextNode("This is a link to example page", "link", "http://example.com")
-    
-    # Print the representation of the node
-    print(node1)
+    copy_static_files("static", "public")
 
 main()
